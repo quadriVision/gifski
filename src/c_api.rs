@@ -120,6 +120,7 @@ pub unsafe extern "C" fn gifski_new(settings: *const GifskiSettings) -> *const G
         quality: settings.quality,
         fast: settings.fast,
         repeat: if settings.repeat == -1 { Repeat::Finite(0) } else if settings.repeat == 0 { Repeat::Infinite } else { Repeat::Finite(settings.repeat as u16) },
+        ignore_deduplication: false
     };
 
     if let Ok((collector, writer)) = crate::new(s) {

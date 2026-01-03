@@ -85,6 +85,8 @@ pub struct Settings {
     pub fast: bool,
     /// Sets the looping method for the image sequence.
     pub repeat: Repeat,
+    /// Won't deduplicate identical frames.
+    pub ignore_deduplication: bool
 }
 
 #[derive(Copy, Clone)]
@@ -141,6 +143,7 @@ impl Default for Settings {
             quality: 100,
             fast: false,
             repeat: Repeat::Infinite,
+            ignore_deduplication: false
         }
     }
 }
@@ -746,7 +749,7 @@ impl Writer {
 
             let dispose = if let Some(DiffMessage { image: next_image, .. }) = &next_frame {
                 // Skip identical frames
-                if next_image.as_ref() == image.as_ref() {
+                if next_image.as_ref() == image.as_ref() && !self.settings.s.ignore_deduplication {
                     // this keeps importance_map of the previous frame in the identical-frame series
                     // (important, because subsequent identical frames have all-zero importance_map and would be dropped too)
                     continue;

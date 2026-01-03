@@ -189,6 +189,11 @@ fn bin_main() -> BinResult<()> {
                             .hide_short_help(true)
                             .value_parser(parse_color_space)
                             .value_name("bt709"))
+                        .arg(Arg::new("ignore-deduplication")
+                            .long("ignore-deduplication")
+                            .help("Disable frame deduplication optimization")
+                            .num_args(0)
+                            .action(ArgAction::SetTrue))
                         .try_get_matches_from(wild::args_os())
                         .unwrap_or_else(|e| {
                             if e.kind() == MissingRequiredArgument && !stdin().is_terminal() {
@@ -218,12 +223,14 @@ fn bin_main() -> BinResult<()> {
     let motion_quality = matches.get_one::<u8>("motion-quality").copied();
     let lossy_quality = matches.get_one::<u8>("lossy-quality").copied();
     let fast = matches.get_flag("fast");
+    let ignore_deduplication = matches.get_flag("ignore-deduplication");
     let settings = Settings {
         width,
         height,
         quality: matches.get_one::<u8>("quality").copied().unwrap_or(100),
         fast,
         repeat,
+        ignore_deduplication
     };
     let quiet = matches.get_flag("quiet") || output_path == DestPath::Stdout;
     let fps: f32 = matches.get_one::<f32>("fps").copied().ok_or("?")?;
